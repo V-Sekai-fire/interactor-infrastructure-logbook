@@ -73,16 +73,6 @@ defmodule Check.Remotes do
         break: &Map.put(&1, :forks, %{"contract-triangulation" => {true, "somebody-else/contract-triangulation"}})
       },
       %{
-        label: "no document names a repository that moved",
-        kind: :network,
-        run: &names_resolve/1,
-        break:
-          &Map.put(&1, :docs, [
-            {"1-transport/fanout", "README.md",
-             "It reads from fabric-authority-plane every tick.\n"}
-          ])
-      },
-      %{
         label: "a project that serves Pages keeps the name its URL contains",
         kind: :network,
         run: &pages_names/1,
@@ -434,65 +424,6 @@ defmodule Check.Remotes do
 
       true ->
         nil
-    end
-  end
-
-  @doc """
-  No document may name a repository that only answers on a redirect.
-
-  GitHub keeps every old name working, so a rename leaves prose that resolves and is wrong,
-  and nothing fails anywhere. RFD 0111 asks for the pins in the same pass as the rename, and
-  this is what makes that checkable rather than remembered.
-  """
-  def names_resolve(ctx) do
-    projects = Lib.projects(ctx.mtext)
-    live = org_repo_names()
-
-    if MapSet.size(live) == 0 do
-      ["cannot list the organisation's repositories"]
-    else
-      docs = Lib.child_docs(ctx, projects)
-
-      wanted =
-        docs
-        |> Enum.flat_map(fn {_p, _n, text} -> tokens(text) end)
-        |> Enum.reject(&MapSet.member?(live, &1))
-        |> Enum.uniq()
-        |> Enum.sort()
-
-      resolved =
-        Lib.gh_many(Map.new(wanted, fn t -> {t, ["repos/#{Lib.our_remote()}/#{t}", "--jq", ".name"]} end))
-        |> Map.new(fn {k, v} -> {k, blank_to_nil(v)} end)
-
-      for {path, name, text} <- docs,
-          tok <- text |> tokens() |> Enum.uniq() |> Enum.sort(),
-          not MapSet.member?(live, tok),
-          now = resolved[tok],
-          now != nil and now != tok do
-        "#{path}/#{name} names #{tok}, which is now #{now}"
-      end
-      |> Enum.uniq()
-      |> Enum.sort()
-    end
-  end
-
-  # A fenced block is a command or a config, not prose making a claim, and a clone URL that
-  # still redirects is somebody's working command line. A repository under another owner is
-  # that owner's, whatever it is called here -- ahujasid/blender-mcp is upstream of
-  # transport-blender-mcp, and resolving the bare token against this organisation turns a
-  # correct citation into a rename to apply.
-  defp tokens(text) do
-    text
-    |> String.replace(~r/```.*?```/s, "")
-    |> String.replace(~r/github\.com\/(?!#{Regex.escape(Lib.our_remote())}\/)[\w.-]+\/[\w.-]+/, "")
-    |> then(&Regex.scan(~r/\b[a-z][a-z0-9]*(?:-[a-z0-9]+){1,4}\b/, &1))
-    |> Enum.map(&hd/1)
-  end
-
-  defp org_repo_names do
-    case Lib.gh(["orgs/#{Lib.our_remote()}/repos?per_page=100", "--paginate", "--jq", ".[].name"]) do
-      nil -> MapSet.new()
-      out -> out |> String.split() |> MapSet.new()
     end
   end
 

@@ -106,8 +106,8 @@ defmodule Check.Lib do
   placement; on the `0-` side that rule reads a directory that is not there.
 
   A plain clone has no `.repo` above it and no children beside it. That is a real layout --
-  it is what CI runs -- so it falls back to this repository's own root and the checks that
-  scan children then scan none, which `Check.Workspace` reports rather than passing quietly.
+  it is what CI runs -- so it falls back to this repository's own root, where the checks that
+  scan children then scan none.
   """
   def workspace_root do
     case climb_to(root(), [".repo"]) do

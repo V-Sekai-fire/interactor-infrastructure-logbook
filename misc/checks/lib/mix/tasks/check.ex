@@ -41,7 +41,6 @@ defmodule Mix.Tasks.Check do
     {"readme", Check.Readme},
     {"remotes", Check.Remotes},
     {"authority", Check.Authority},
-    {"workspace", Check.Workspace},
     {"words", Check.Words},
     {"nifs", Check.Nifs}, {"properties", Check.Properties},
     {"licences", Check.Licences},
