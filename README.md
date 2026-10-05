@@ -1,38 +1,22 @@
-# infrastructure-logbook
+# interactor-infrastructure-logbook
 
-The fabric's record of itself: the conventions every project here works to, the ledger that books the hours, the gates that decide whether these documents are true, and the logbook.
+A logbook of measured results kept beside their retractions, and a doc gate that checks the workspace's documents against its manifest.
 
-It sits on the `0-` side because it is not a side. `default.xml`'s opening comment gives the workspace six position words and one packing word; this is neither. Every other project in the manifest is a subject of this one, which is why it sorts before all of them.
+## What it is for
+
+The logbook records what was measured, with enough of the apparatus to re-run it, and keeps a
+retraction next to what it retracts. The gate is a mix application with one module per concern,
+and every check ships a negative control that must fail on broken input. It reads the manifest
+from the `repo` checkout above this one, and the claims only a remote can answer run before a
+push rather than in CI.
+
+## Run
 
 ```sh
-mix check --fast       # the checkout answers these
-mix check --slow       # what only a remote can answer
-mix check --self-test  # each must fail on broken input
-mix check authority    # one concern, and only it
-mix dialyzer           # the gate's own types
+cd misc/checks
+mix check
 ```
 
-The books are here and the tool that writes them is not. `ledger.py` became a Claude Code plugin in the `.claude` repository, so the hours are read with a slash command and `misc/scripts` is gone:
+## Licence
 
-```
-/ledger:report --since 90   # SPENT, by lane
-/ledger:path                # HYPOTHETICAL, the critical path
-/ledger:build               # rebook from git. Exclusive: it rewrites every book here
-/ledger:verify              # tackler, then regeneration must be byte-identical
-```
-
-Without Claude Code, run the plugin's script directly — `python3 .claude/plugins/ledger/scripts/ledger.py report --since 90` from the workspace root. It finds these books itself, and `FABRIC_LEDGER` names them outright for a clone with no workspace around it, which is what CI is.
-
-## What is here
-
-| | |
-|---|---|
-| `logbook/` | dated entries: what was measured, and what was retracted |
-| `ledger/` | hours booked from git history, and the plan in a separate commodity |
-| `misc/checks` | the gates, one mix module per concern |
-
-## Where the manifest is
-
-Not here. `fabric` holds `default.xml` and nothing else, and `repo init` clones it to `.repo/manifests` and reads it from there. The gates read it from that checkout, found by looking for `.repo` above this one, and `FABRIC_MANIFEST` overrides that for a bare clone with no workspace around it — which is what CI is.
-
-The two were one repository until the jobs were told apart. A manifest is read by a tool on every sync; a record is read by people and rewritten as the work moves, and keeping both in one place made every entry here a commit against the manifest. `CLAUDE.md` says why each rule exists.
+MIT; see `LICENSE`.
