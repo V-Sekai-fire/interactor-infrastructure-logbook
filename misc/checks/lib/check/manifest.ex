@@ -119,7 +119,7 @@ defmodule Check.Manifest do
 
   `1-transport/gateway-c` is `transport-gateway-c`, and the leading digit sorts the ring
   rather than naming anything. This is what stops the checkout drifting from the names
-  RFD 0111 decided: a path that no longer rebuilds its own name means one of the two moved
+  RFD66606-0111 decided: a path that no longer rebuilds its own name means one of the two moved
   without the other.
 
   The exceptions are in `fixed_names/0`, and each is a fact rather than a taste: that name

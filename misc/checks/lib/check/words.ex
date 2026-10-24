@@ -1,4 +1,4 @@
-# The vocabulary RFD 0111 decided, held against every document in the children.
+# The vocabulary RFD66606-0111 decided, held against every document in the children.
 #
 # This concern scans files in the children rather than text passed in, so a breakage that
 # edits the manifest or the README cannot reach it. Its control injects a defective document
@@ -23,7 +23,7 @@ defmodule Check.Words do
     ]
   end
 
-  # Only the compounds RFD 0111 names. "Control plane" and "data plane" survive it, because
+  # Only the compounds RFD66606-0111 names. "Control plane" and "data plane" survive it, because
   # they name a class of traffic rather than a process, so a document using either is not a
   # finding.
   @retired [
@@ -32,7 +32,7 @@ defmodule Check.Words do
     {~r/\bplane rules?\b/i, "plane rule -> interactor rule"}
   ]
 
-  @doc "RFD 0111 retired plane, edge plane, and domain as nouns for a process."
+  @doc "RFD66606-0111 retired plane, edge plane, and domain as nouns for a process."
   def retired_words(ctx) do
     projects = Lib.projects(ctx.mtext)
 
